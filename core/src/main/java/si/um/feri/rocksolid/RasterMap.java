@@ -4,7 +4,7 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -15,7 +15,6 @@ import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -33,7 +32,7 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
 
     private TiledMap tiledMap;
     private TiledMapRenderer tiledMapRenderer;
-    private OrthographicCamera camera;
+    private PerspectiveCamera camera;
 
     private Texture[] mapTiles;
     private ZoomXY beginTile;   // top left tile
@@ -48,12 +47,11 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
     public void create() {
         shapeRenderer = new ShapeRenderer();
 
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, Constants.MAP_WIDTH, Constants.MAP_HEIGHT);
-        camera.position.set(Constants.MAP_WIDTH / 2f, Constants.MAP_HEIGHT / 2f, 0);
-        camera.viewportWidth = Constants.MAP_WIDTH / 2f;
-        camera.viewportHeight = Constants.MAP_HEIGHT / 2f;
-        camera.zoom = 2f;
+        camera = new PerspectiveCamera(70, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        camera.position.set(Constants.MAP_WIDTH / 2f, Constants.MAP_HEIGHT / 2f, 500);
+        camera.lookAt(Constants.MAP_WIDTH / 2f, Constants.MAP_HEIGHT / 2f, 0);
+        camera.near = 1f;
+        camera.far = 3000f;
         camera.update();
 
         touchPosition = new Vector3();
@@ -94,7 +92,7 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
 
         camera.update();
 
-        tiledMapRenderer.setView(camera);
+        tiledMapRenderer.setView(camera.combined, 0, 0, Constants.MAP_WIDTH, Constants.MAP_HEIGHT);
         tiledMapRenderer.render();
 
         drawMarkers();
@@ -139,21 +137,18 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
 
     @Override
     public boolean pan(float x, float y, float deltaX, float deltaY) {
-        camera.translate(-deltaX, deltaY);
-        return false;
-    }
-
-    @Override
-    public boolean panStop(float x, float y, int pointer, int button) {
+        camera.translate(-deltaX, deltaY, 0);
+        camera.update();
         return false;
     }
 
     @Override
     public boolean zoom(float initialDistance, float distance) {
-        if (initialDistance >= distance)
-            camera.zoom += 0.02;
-        else
-            camera.zoom -= 0.02;
+        return false;
+    }
+
+    @Override
+    public boolean panStop(float x, float y, int pointer, int button) {
         return false;
     }
 
@@ -168,31 +163,50 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
     }
 
     private void handleInput() {
+        float deltaTime = Gdx.graphics.getDeltaTime();
+        float moveSpeed = 250f * deltaTime;
+        float rotateSpeed = 100f * deltaTime;
+
+        if (Gdx.input.isKeyPressed(Input.Keys.R)) {
+            camera.position.set(Constants.MAP_WIDTH / 2f, Constants.MAP_HEIGHT / 2f, 500);
+            camera.direction.set(0, 0, -1);
+            camera.up.set(0, 1, 0);
+            camera.lookAt(Constants.MAP_WIDTH / 2f, Constants.MAP_HEIGHT / 2f, 0);
+            camera.update();
+            return;
+        }
+
+        Vector3 forwardNormalizedVector = new Vector3(camera.direction.x, camera.direction.y, 0).nor();
+        Vector3 rightNormalizedVector = forwardNormalizedVector.cpy().crs(Vector3.Z).nor();
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+            camera.translate(forwardNormalizedVector.cpy().scl(moveSpeed));
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+            camera.translate(forwardNormalizedVector.cpy().scl(-moveSpeed));
+        }
         if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-            camera.zoom += 0.02;
+            camera.translate(rightNormalizedVector.cpy().scl(-moveSpeed));
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+            camera.translate(rightNormalizedVector.cpy().scl(moveSpeed));
         }
         if (Gdx.input.isKeyPressed(Input.Keys.Q)) {
-            camera.zoom -= 0.02;
+            camera.translate(0, 0, -moveSpeed);
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.E)) {
+            camera.translate(0, 0, moveSpeed);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            camera.translate(-3, 0, 0);
+            camera.rotate(Vector3.Z, rotateSpeed);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            camera.translate(3, 0, 0);
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            camera.translate(0, -3, 0);
+            camera.rotate(Vector3.Z, -rotateSpeed);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            camera.translate(0, 3, 0);
+            camera.rotate(camera.direction.cpy().crs(camera.up).nor(), rotateSpeed);
         }
-
-        camera.zoom = MathUtils.clamp(camera.zoom, 0.5f, 2f);
-
-        float effectiveViewportWidth = camera.viewportWidth * camera.zoom;
-        float effectiveViewportHeight = camera.viewportHeight * camera.zoom;
-
-        camera.position.x = MathUtils.clamp(camera.position.x, effectiveViewportWidth / 2f, Constants.MAP_WIDTH - effectiveViewportWidth / 2f);
-        camera.position.y = MathUtils.clamp(camera.position.y, effectiveViewportHeight / 2f, Constants.MAP_HEIGHT - effectiveViewportHeight / 2f);
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+            camera.rotate(camera.direction.cpy().crs(camera.up).nor(), -rotateSpeed);
+        }
     }
 }

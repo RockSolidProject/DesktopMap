@@ -13,17 +13,17 @@ import java.net.URL;
 public class MapRasterTiles {
     //Mapbox
     //https://docs.mapbox.com/api/maps/raster-tiles/
-    /*static String mapServiceUrl = "https://api.mapbox.com/v4/";
+    static String mapServiceUrl = "https://api.mapbox.com/v4/";
     static String token = "?access_token=" + Keys.MAPBOX;
     static String tilesetId = "mapbox.satellite";
-    static String format = "@2x.jpg90";*/
+    static String format = "@2x.jpg90";
 
     //Geoapify
     //https://www.geoapify.com/get-started-with-maps-api
-    static String mapServiceUrl = "https://maps.geoapify.com/v1/tile/";
+    /*static String mapServiceUrl = "https://maps.geoapify.com/v1/tile/";
     static String token = "?&apiKey=" + Keys.GEOAPIFY;
     static String tilesetId = "klokantech-basic";
-    static String format = "@2x.png";
+    static String format = "@2x.png";*/
 
     //@2x in format means it returns higher DPI version of the image and the image size is 512px (otherwise it is 256px)
     final static public int TILE_SIZE = 512;
