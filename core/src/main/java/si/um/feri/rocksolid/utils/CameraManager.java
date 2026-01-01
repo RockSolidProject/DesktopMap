@@ -7,14 +7,17 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 
 public class CameraManager {
-    private PerspectiveCamera camera;
+    private final PerspectiveCamera camera;
+    private float currentPitch;
 
     public CameraManager() {
-        camera = new PerspectiveCamera(Constants.Camera.CAMERA_FOW, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        camera.position.set(Constants.MAP_WIDTH / 2f, Constants.MAP_HEIGHT / 2f, 500);
+        camera = new PerspectiveCamera(Constants.Camera.FOV, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        camera.position.set(Constants.MAP_WIDTH / 2f, Constants.MAP_HEIGHT / 2f, Constants.Camera.STARTING_HEIGHT);
         camera.lookAt(Constants.MAP_WIDTH / 2f, Constants.MAP_HEIGHT / 2f, 0);
-        camera.near = 1f;
-        camera.far = 3000f;
+        camera.near = Constants.Camera.NEAR;
+        camera.far = Constants.Camera.FAR;
+        camera.rotate(camera.direction.cpy().crs(camera.up).nor(), Constants.Camera.STARTING_PITCH);
+        currentPitch = Constants.Camera.STARTING_PITCH;
         camera.update();
     }
 
@@ -27,17 +30,8 @@ public class CameraManager {
     }
 
     public void handleInput(float deltaTime) {
-        float moveSpeed = 250f * deltaTime;
-        float rotateSpeed = 100f * deltaTime;
-
-        if (Gdx.input.isKeyPressed(Input.Keys.R)) {
-            camera.position.set(Constants.MAP_WIDTH / 2f, Constants.MAP_HEIGHT / 2f, 500);
-            camera.direction.set(0, 0, -1);
-            camera.up.set(0, 1, 0);
-            camera.lookAt(Constants.MAP_WIDTH / 2f, Constants.MAP_HEIGHT / 2f, 0);
-            camera.update();
-            return;
-        }
+        float moveSpeed = Constants.Camera.MOVE_SPEED * deltaTime;
+        float rotateSpeed = Constants.Camera.ROTATE_SPEED * deltaTime;
 
         Vector3 forwardNormalizedVector = new Vector3(camera.direction.x, camera.direction.y, 0).nor();
         Vector3 rightNormalizedVector = forwardNormalizedVector.cpy().crs(Vector3.Z).nor();
@@ -59,17 +53,28 @@ public class CameraManager {
         if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
             camera.translate(0, 0, moveSpeed);
         }
+        // Enforce max and min camera height
+        camera.position.z = Math.max(Constants.Camera.MIN_HEIGHT, Math.min(Constants.Camera.MAX_HEIGHT, camera.position.z));
+
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             camera.rotate(Vector3.Z, rotateSpeed);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             camera.rotate(Vector3.Z, -rotateSpeed);
         }
+
+        // Pitch control
+        float pitchDelta = 0f;
         if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            camera.rotate(camera.direction.cpy().crs(camera.up).nor(), rotateSpeed);
+            pitchDelta = rotateSpeed;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            camera.rotate(camera.direction.cpy().crs(camera.up).nor(), -rotateSpeed);
+            pitchDelta = -rotateSpeed;
+        }
+        float newPitch = currentPitch + pitchDelta;
+        if (newPitch >= Constants.Camera.MIN_PITCH && newPitch <= Constants.Camera.MAX_PITCH) {
+            camera.rotate(camera.direction.cpy().crs(camera.up).nor(), pitchDelta);
+            currentPitch = newPitch;
         }
     }
 }

@@ -25,7 +25,6 @@ import java.io.IOException;
 public class RasterMap extends ApplicationAdapter implements GestureDetector.GestureListener {
 
     private ShapeRenderer shapeRenderer;
-    private Vector3 touchPosition;
 
     private TiledMap tiledMap;
     private TiledMapRenderer tiledMapRenderer;
@@ -36,9 +35,6 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
     // center geolocation
     private final Geolocation CENTER_GEOLOCATION = new Geolocation(46.557314, 15.637771);
 
-    // test marker
-    private final Geolocation MARKER_GEOLOCATION = new Geolocation(46.559070, 15.638100);
-
     private CameraManager cameraManager;
 
     @Override
@@ -46,8 +42,6 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
         shapeRenderer = new ShapeRenderer();
 
         cameraManager = new CameraManager();
-
-        touchPosition = new Vector3();
 
         try {
             //in most cases, geolocation won't be in the center of the tile because tile borders are predetermined (geolocation can be at the corner of a tile)
@@ -87,18 +81,6 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
         ScreenUtils.clear(0, 0, 0, 1);
         tiledMapRenderer.setView(cameraManager.getCombinedMatrix(), 0, 0, Constants.MAP_WIDTH, Constants.MAP_HEIGHT);
         tiledMapRenderer.render();
-
-        drawMarkers();
-    }
-
-    private void drawMarkers() {
-        Vector2 marker = MapRasterTiles.getPixelPosition(MARKER_GEOLOCATION.lat, MARKER_GEOLOCATION.lng, beginTile.x, beginTile.y);
-
-        shapeRenderer.setProjectionMatrix(cameraManager.getCombinedMatrix());
-        shapeRenderer.setColor(Color.RED);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.circle(marker.x, marker.y, 10);
-        shapeRenderer.end();
     }
 
     @Override
