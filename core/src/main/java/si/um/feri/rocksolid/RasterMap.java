@@ -18,10 +18,7 @@ import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
-import si.um.feri.rocksolid.utils.Constants;
-import si.um.feri.rocksolid.utils.Geolocation;
-import si.um.feri.rocksolid.utils.MapRasterTiles;
-import si.um.feri.rocksolid.utils.ZoomXY;
+import si.um.feri.rocksolid.utils.*;
 
 import java.io.IOException;
 
@@ -32,7 +29,6 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
 
     private TiledMap tiledMap;
     private TiledMapRenderer tiledMapRenderer;
-    private PerspectiveCamera camera;
 
     private Texture[] mapTiles;
     private ZoomXY beginTile;   // top left tile
@@ -43,16 +39,13 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
     // test marker
     private final Geolocation MARKER_GEOLOCATION = new Geolocation(46.559070, 15.638100);
 
+    private CameraManager cameraManager;
+
     @Override
     public void create() {
         shapeRenderer = new ShapeRenderer();
 
-        camera = new PerspectiveCamera(70, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        camera.position.set(Constants.MAP_WIDTH / 2f, Constants.MAP_HEIGHT / 2f, 500);
-        camera.lookAt(Constants.MAP_WIDTH / 2f, Constants.MAP_HEIGHT / 2f, 0);
-        camera.near = 1f;
-        camera.far = 3000f;
-        camera.update();
+        cameraManager = new CameraManager();
 
         touchPosition = new Vector3();
 
@@ -86,13 +79,13 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
 
     @Override
     public void render() {
+        float deltaTime = Gdx.graphics.getDeltaTime();
+        cameraManager.handleInput(deltaTime);
+
+        cameraManager.update();
+
         ScreenUtils.clear(0, 0, 0, 1);
-
-        handleInput();
-
-        camera.update();
-
-        tiledMapRenderer.setView(camera.combined, 0, 0, Constants.MAP_WIDTH, Constants.MAP_HEIGHT);
+        tiledMapRenderer.setView(cameraManager.getCombinedMatrix(), 0, 0, Constants.MAP_WIDTH, Constants.MAP_HEIGHT);
         tiledMapRenderer.render();
 
         drawMarkers();
@@ -101,7 +94,7 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
     private void drawMarkers() {
         Vector2 marker = MapRasterTiles.getPixelPosition(MARKER_GEOLOCATION.lat, MARKER_GEOLOCATION.lng, beginTile.x, beginTile.y);
 
-        shapeRenderer.setProjectionMatrix(camera.combined);
+        shapeRenderer.setProjectionMatrix(cameraManager.getCombinedMatrix());
         shapeRenderer.setColor(Color.RED);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.circle(marker.x, marker.y, 10);
@@ -115,8 +108,6 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
 
     @Override
     public boolean touchDown(float x, float y, int pointer, int button) {
-        touchPosition.set(x, y, 0);
-        camera.unproject(touchPosition);
         return false;
     }
 
@@ -137,8 +128,6 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
 
     @Override
     public boolean pan(float x, float y, float deltaX, float deltaY) {
-        camera.translate(-deltaX, deltaY, 0);
-        camera.update();
         return false;
     }
 
@@ -159,54 +148,5 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
 
     @Override
     public void pinchStop() {
-
-    }
-
-    private void handleInput() {
-        float deltaTime = Gdx.graphics.getDeltaTime();
-        float moveSpeed = 250f * deltaTime;
-        float rotateSpeed = 100f * deltaTime;
-
-        if (Gdx.input.isKeyPressed(Input.Keys.R)) {
-            camera.position.set(Constants.MAP_WIDTH / 2f, Constants.MAP_HEIGHT / 2f, 500);
-            camera.direction.set(0, 0, -1);
-            camera.up.set(0, 1, 0);
-            camera.lookAt(Constants.MAP_WIDTH / 2f, Constants.MAP_HEIGHT / 2f, 0);
-            camera.update();
-            return;
-        }
-
-        Vector3 forwardNormalizedVector = new Vector3(camera.direction.x, camera.direction.y, 0).nor();
-        Vector3 rightNormalizedVector = forwardNormalizedVector.cpy().crs(Vector3.Z).nor();
-        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-            camera.translate(forwardNormalizedVector.cpy().scl(moveSpeed));
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-            camera.translate(forwardNormalizedVector.cpy().scl(-moveSpeed));
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-            camera.translate(rightNormalizedVector.cpy().scl(-moveSpeed));
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-            camera.translate(rightNormalizedVector.cpy().scl(moveSpeed));
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.Q)) {
-            camera.translate(0, 0, -moveSpeed);
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.E)) {
-            camera.translate(0, 0, moveSpeed);
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            camera.rotate(Vector3.Z, rotateSpeed);
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            camera.rotate(Vector3.Z, -rotateSpeed);
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            camera.rotate(camera.direction.cpy().crs(camera.up).nor(), rotateSpeed);
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            camera.rotate(camera.direction.cpy().crs(camera.up).nor(), -rotateSpeed);
-        }
     }
 }
