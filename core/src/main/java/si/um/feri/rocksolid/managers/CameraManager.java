@@ -1,10 +1,11 @@
-package si.um.feri.rocksolid.utils;
+package si.um.feri.rocksolid.managers;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
+import si.um.feri.rocksolid.constants.Constants;
 
 public class CameraManager {
     private final PerspectiveCamera camera;

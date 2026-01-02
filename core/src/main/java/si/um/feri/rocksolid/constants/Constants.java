@@ -1,6 +1,7 @@
-package si.um.feri.rocksolid.utils;
+package si.um.feri.rocksolid.constants;
 
 import com.badlogic.gdx.Gdx;
+import si.um.feri.rocksolid.utils.MapRasterTiles;
 
 public class Constants {
     public static final int NUM_TILES = 3;
