@@ -204,12 +204,12 @@ public class MapRasterTiles {
     public static Vector2 getPixelPosition(double lat, double lng, int beginTileX, int beginTileY) {
         double[] worldCoordinate = project(lat, lng, MapRasterTiles.TILE_SIZE);
         // Scale to fit our image
-        double scale = Math.pow(2, Constants.ZOOM);
+        double scale = Math.pow(2, Constants.Map.ZOOM);
 
         // Apply scale to world coordinates to get image coordinates
         return new Vector2(
                 (int) (Math.floor(worldCoordinate[0] * scale) - (beginTileX * MapRasterTiles.TILE_SIZE)),
-                Constants.MAP_HEIGHT - (int) (Math.floor(worldCoordinate[1] * scale) - (beginTileY * MapRasterTiles.TILE_SIZE) - 1)
+                Constants.Map.MAP_HEIGHT - (int) (Math.floor(worldCoordinate[1] * scale) - (beginTileY * MapRasterTiles.TILE_SIZE) - 1)
         );
     }
 

@@ -13,8 +13,8 @@ public class CameraManager {
 
     public CameraManager() {
         camera = new PerspectiveCamera(Constants.Camera.FOV, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        camera.position.set(Constants.MAP_WIDTH / 2f, Constants.MAP_HEIGHT / 2f, Constants.Camera.STARTING_HEIGHT);
-        camera.lookAt(Constants.MAP_WIDTH / 2f, Constants.MAP_HEIGHT / 2f, 0);
+        camera.position.set(Constants.Map.MAP_WIDTH / 2f, Constants.Map.MAP_HEIGHT / 2f, Constants.Camera.STARTING_HEIGHT);
+        camera.lookAt(Constants.Map.MAP_WIDTH / 2f, Constants.Map.MAP_HEIGHT / 2f, 0);
         camera.near = Constants.Camera.NEAR;
         camera.far = Constants.Camera.FAR;
         camera.rotate(camera.direction.cpy().crs(camera.up).nor(), Constants.Camera.STARTING_PITCH);

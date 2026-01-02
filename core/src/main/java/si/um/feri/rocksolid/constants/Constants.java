@@ -1,15 +1,17 @@
 package si.um.feri.rocksolid.constants;
 
-import com.badlogic.gdx.Gdx;
+import si.um.feri.rocksolid.utils.Geolocation;
 import si.um.feri.rocksolid.utils.MapRasterTiles;
 
 public class Constants {
-    public static final int NUM_TILES = 3;
-    public static final int ZOOM = 15;
-    public static final int MAP_WIDTH = MapRasterTiles.TILE_SIZE * NUM_TILES;
-    public static final int MAP_HEIGHT = MapRasterTiles.TILE_SIZE * NUM_TILES;
-    public static final int HUD_WIDTH = Gdx.graphics.getWidth();
-    public static final int HUD_HEIGHT = Gdx.graphics.getHeight();
+    public static final Geolocation CENTER_GEOLOCATION = new Geolocation(46.5583797, 15.6390876);
+
+    public static class Map {
+        public static final int NUM_TILES = 6;
+        public static final int ZOOM = 17;
+        public static final int MAP_WIDTH = MapRasterTiles.TILE_SIZE * NUM_TILES;
+        public static final int MAP_HEIGHT = MapRasterTiles.TILE_SIZE * NUM_TILES;
+    }
 
     public static class Camera {
         public static final float FOV = 70f;
