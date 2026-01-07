@@ -2,6 +2,7 @@ package si.um.feri.rocksolid;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
@@ -43,6 +44,7 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
     public void render() {
         float deltaTime = Gdx.graphics.getDeltaTime();
         cameraManager.handleInput(deltaTime);
+        climbingSpotManager.handleInput(cameraManager.getCamera());
 
         cameraManager.update();
         climbingSpotManager.update(deltaTime);

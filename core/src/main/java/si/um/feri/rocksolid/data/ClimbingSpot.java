@@ -26,7 +26,6 @@ public class ClimbingSpot {
         System.out.println(this.toString());
     }
 
-    // TODO this must be called for evey climbing spot when the timer for removing old expires
     public void refreshPeople() {
         previousPeopleSet = currentPeopleSet;
         currentPeopleSet = new HashSet<>();

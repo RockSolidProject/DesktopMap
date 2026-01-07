@@ -1,8 +1,11 @@
 package si.um.feri.rocksolid.utils;
 
+import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.collision.Ray;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import si.um.feri.rocksolid.constants.Constants;
@@ -216,6 +219,28 @@ public class MapRasterTiles {
                 (int) (Math.floor(worldCoordinate[0] * scale) - (beginTileX * tileSize)),
                 height - (int) (Math.floor(worldCoordinate[1] * scale) - (beginTileY * tileSize) - 1)
         );
+    }
+
+    @Nullable
+    public static Vector2 getPixelPositionFromScreenCoordinates(float screenX, float screenY, PerspectiveCamera camera) {
+        Ray ray = camera.getPickRay(screenX, screenY);
+        if (Math.abs(ray.direction.z) < 0.0001f) return null;
+        float t = -ray.origin.z / ray.direction.z;
+        if (t < 0) return null;
+        return new Vector2(
+            ray.origin.x + t * ray.direction.x,
+            ray.origin.y + t * ray.direction.y
+        );
+    }
+
+    public static Geolocation getGeolocationFromPixel(float pixelX, float pixelY, ZoomXY beginTile) {
+        double scale = Math.pow(2, Constants.Map.ZOOM);
+        double worldX = (pixelX + (beginTile.x * TILE_SIZE)) / scale;
+        double worldY = (Constants.Map.MAP_HEIGHT - pixelY + (beginTile.y * TILE_SIZE) + 1) / scale;
+        double lng = (worldX / TILE_SIZE) * 360.0 - 180.0;
+        double n = Math.PI - (2.0 * Math.PI * worldY) / TILE_SIZE;
+        double lat = Math.toDegrees(Math.atan(Math.sinh(n)));
+        return new Geolocation(lat, lng);
     }
 
     public static Vector2 getPixelPosition(double lat, double lng, ZoomXY beginTile) {

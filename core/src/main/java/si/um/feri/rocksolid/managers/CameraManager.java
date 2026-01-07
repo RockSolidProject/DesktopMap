@@ -78,4 +78,7 @@ public class CameraManager {
             currentPitch = newPitch;
         }
     }
+    public PerspectiveCamera getCamera() {
+        return camera;
+    }
 }

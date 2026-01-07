@@ -1,6 +1,9 @@
 package si.um.feri.rocksolid.managers;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
@@ -38,8 +41,21 @@ public class ClimbingSpotManager {
         }
     }
 
-    public void onClick(float x, float y) {
-        // TODO
+    public void handleInput(PerspectiveCamera camera) {
+        if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
+            float screenX = Gdx.input.getX();
+            float screenY = Gdx.input.getY();
+            onRightClick(screenX, screenY, camera);
+        }
+    }
+
+    private void onRightClick(float screenX, float screenY, PerspectiveCamera camera) {
+        Vector2 pixelCoordinates = MapRasterTiles.getPixelPositionFromScreenCoordinates(screenX, screenY, camera);
+        if (pixelCoordinates == null) return;
+        Geolocation clickedLocation = MapRasterTiles.getGeolocationFromPixel(
+            pixelCoordinates.x, pixelCoordinates.y, GameManager.INSTANCE.getBeginTile()
+        );
+        addClimbingSpot(new ClimbingSpot(clickedLocation, "TEST"));
     }
 
     public void addClimbingSpots(Array<ClimbingSpot> spots) {
