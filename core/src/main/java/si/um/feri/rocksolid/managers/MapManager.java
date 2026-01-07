@@ -11,7 +11,6 @@ import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.Matrix4;
 import si.um.feri.rocksolid.constants.Constants;
 import si.um.feri.rocksolid.utils.MapRasterTiles;
-import si.um.feri.rocksolid.utils.ZoomXY;
 
 import java.io.IOException;
 
@@ -19,12 +18,9 @@ public class MapManager {
     private TiledMap tiledMap;
     private TiledMapRenderer tiledMapRenderer;
     private Texture[] mapTiles;
-    private ZoomXY beginTile;   // top left tile
 
     public MapManager() throws IOException {
-        ZoomXY centerTile = MapRasterTiles.getTileNumber(Constants.CENTER_GEOLOCATION.lat, Constants.CENTER_GEOLOCATION.lng, Constants.Map.ZOOM);
-        mapTiles = MapRasterTiles.getRasterTileZone(centerTile, Constants.Map.NUM_TILES);
-        beginTile = new ZoomXY(Constants.Map.ZOOM, centerTile.x - ((Constants.Map.NUM_TILES - 1) / 2), centerTile.y - ((Constants.Map.NUM_TILES - 1) / 2));
+        mapTiles = MapRasterTiles.getRasterTileZone(GameManager.INSTANCE.getCenterTile(), Constants.Map.NUM_TILES);
 
         tiledMap = new TiledMap();
         MapLayers layers = tiledMap.getLayers();
@@ -47,10 +43,6 @@ public class MapManager {
     public void render(Matrix4 combinedMatrix) {
         tiledMapRenderer.setView(combinedMatrix, 0, 0, Constants.Map.MAP_WIDTH, Constants.Map.MAP_HEIGHT);
         tiledMapRenderer.render();
-    }
-
-    public ZoomXY getBeginTile() {
-        return beginTile;
     }
 
     public void dispose() {

@@ -218,6 +218,10 @@ public class MapRasterTiles {
         );
     }
 
+    public static Vector2 getPixelPosition(double lat, double lng, ZoomXY beginTile) {
+        return getPixelPosition(lat, lng, beginTile.x, beginTile.y);
+    }
+
     public static Vector2 getPixelPosition(double lat, double lng, int beginTileX, int beginTileY) {
         double[] worldCoordinate = project(lat, lng, MapRasterTiles.TILE_SIZE);
         // Scale to fit our image

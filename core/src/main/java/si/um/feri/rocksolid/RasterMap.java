@@ -7,6 +7,7 @@ import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import si.um.feri.rocksolid.managers.CameraManager;
+import si.um.feri.rocksolid.managers.GameManager;
 import si.um.feri.rocksolid.managers.MapManager;
 
 import java.io.IOException;
@@ -19,12 +20,14 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
     @Override
     public void create() {
         shapeRenderer = new ShapeRenderer();
-        cameraManager = new CameraManager();
+
         try {
+            GameManager.INSTANCE.init();
             mapManager = new MapManager();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        cameraManager = new CameraManager();
     }
 
     @Override
