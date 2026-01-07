@@ -7,7 +7,7 @@ public class Constants {
     public static final Geolocation CENTER_GEOLOCATION = new Geolocation(46.5583797, 15.6390876);
 
     public static class Map {
-        public static final int NUM_TILES = 9;
+        public static final int NUM_TILES = 10;
         public static final int ZOOM = 16;
         public static final int MAP_WIDTH = MapRasterTiles.TILE_SIZE * NUM_TILES;
         public static final int MAP_HEIGHT = MapRasterTiles.TILE_SIZE * NUM_TILES;
