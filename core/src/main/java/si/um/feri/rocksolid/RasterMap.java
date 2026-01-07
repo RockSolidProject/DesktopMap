@@ -6,9 +6,12 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
+import si.um.feri.rocksolid.data.ClimbingSpot;
 import si.um.feri.rocksolid.managers.CameraManager;
+import si.um.feri.rocksolid.managers.ClimbingSpotManager;
 import si.um.feri.rocksolid.managers.GameManager;
 import si.um.feri.rocksolid.managers.MapManager;
+import si.um.feri.rocksolid.utils.Geolocation;
 
 import java.io.IOException;
 
@@ -16,6 +19,7 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
     private ShapeRenderer shapeRenderer;
     private CameraManager cameraManager;
     private MapManager mapManager;
+    private ClimbingSpotManager climbingSpotManager;
 
     @Override
     public void create() {
@@ -28,6 +32,11 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
             e.printStackTrace();
         }
         cameraManager = new CameraManager();
+        climbingSpotManager = new ClimbingSpotManager();
+
+        // TODO when we have loading from api, remove these testing climbing spots
+        climbingSpotManager.addClimbingSpot(new ClimbingSpot(new Geolocation(46.554771048530625, 15.635462756256741), "Klajmber"));
+        climbingSpotManager.addClimbingSpot(new ClimbingSpot(new Geolocation(46.55625500084336, 15.635594798322796), "Klajmber"));
     }
 
     @Override
@@ -39,6 +48,7 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
 
         ScreenUtils.clear(0, 0, 0, 1);
         mapManager.render(cameraManager.getCombinedMatrix());
+        climbingSpotManager.render(shapeRenderer, cameraManager.getCombinedMatrix());
     }
 
     @Override

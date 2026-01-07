@@ -8,7 +8,7 @@ public class Constants {
 
     public static class Map {
         public static final int NUM_TILES = 9;
-        public static final int ZOOM = 17;
+        public static final int ZOOM = 16;
         public static final int MAP_WIDTH = MapRasterTiles.TILE_SIZE * NUM_TILES;
         public static final int MAP_HEIGHT = MapRasterTiles.TILE_SIZE * NUM_TILES;
         public static final String TILE_CACHE_DIR = "tile_cache";
@@ -26,5 +26,9 @@ public class Constants {
         public static final float ROTATE_SPEED = 100f;
         public static final float NEAR = 1f;
         public static final float FAR = 3000f;
+    }
+
+    public static class ClimbingSpot {
+        public static final int PROXIMITY_DISTANCE_M = 50;
     }
 }
