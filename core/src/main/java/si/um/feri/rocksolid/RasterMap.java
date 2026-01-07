@@ -45,6 +45,7 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
         cameraManager.handleInput(deltaTime);
 
         cameraManager.update();
+        climbingSpotManager.update(deltaTime);
 
         ScreenUtils.clear(0, 0, 0, 1);
         mapManager.render(cameraManager.getCombinedMatrix());

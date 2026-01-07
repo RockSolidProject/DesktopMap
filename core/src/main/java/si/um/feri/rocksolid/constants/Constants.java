@@ -30,5 +30,6 @@ public class Constants {
 
     public static class ClimbingSpot {
         public static final int PROXIMITY_DISTANCE_M = 50;
+        public static final float PEOPLE_RESET_TIME_S = 10f * 60f;
     }
 }

@@ -12,8 +12,7 @@ import si.um.feri.rocksolid.utils.Geolocation;
 import si.um.feri.rocksolid.utils.MapRasterTiles;
 
 public class ClimbingSpotManager {
-    // TODO handle number of people and their timers REFRESH
-
+    private float peopleRefreshTimer = 0f;
     private final Array<ClimbingSpot> climbingSpots = new Array<>();
 
     public ClimbingSpotManager() {}
@@ -27,6 +26,16 @@ public class ClimbingSpotManager {
             shapeRenderer.circle(marker.x, marker.y, 10);
         }
         shapeRenderer.end();
+    }
+
+    public void update(float deltaTime) {
+        peopleRefreshTimer += deltaTime;
+        if (peopleRefreshTimer >= Constants.ClimbingSpot.PEOPLE_RESET_TIME_S) {
+            peopleRefreshTimer = 0f;
+            for (ClimbingSpot spot : climbingSpots) {
+                spot.refreshPeople();
+            }
+        }
     }
 
     public void onClick(float x, float y) {
