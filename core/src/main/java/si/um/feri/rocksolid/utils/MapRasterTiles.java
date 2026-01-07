@@ -1,5 +1,6 @@
 package si.um.feri.rocksolid.utils;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -9,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import si.um.feri.rocksolid.constants.Constants;
+import si.um.feri.rocksolid.managers.GameManager;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -230,6 +232,19 @@ public class MapRasterTiles {
         return new Vector2(
             ray.origin.x + t * ray.direction.x,
             ray.origin.y + t * ray.direction.y
+        );
+    }
+
+    @Nullable
+    public static Geolocation getMouseCursorGeoLocation(PerspectiveCamera camera) {
+        float screenX = Gdx.input.getX();
+        float screenY = Gdx.input.getY();
+        Vector2 pixelCoordinates = MapRasterTiles.getPixelPositionFromScreenCoordinates(screenX, screenY, camera);
+        if (pixelCoordinates == null) {
+            return null;
+        }
+        return MapRasterTiles.getGeolocationFromPixel(
+            pixelCoordinates.x, pixelCoordinates.y, GameManager.INSTANCE.getBeginTile()
         );
     }
 

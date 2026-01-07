@@ -1,6 +1,8 @@
 package si.um.feri.rocksolid.managers;
 
+import org.jetbrains.annotations.Nullable;
 import si.um.feri.rocksolid.constants.Constants;
+import si.um.feri.rocksolid.data.ClimbingSpot;
 import si.um.feri.rocksolid.utils.MapRasterTiles;
 import si.um.feri.rocksolid.utils.ZoomXY;
 
@@ -8,6 +10,8 @@ public class GameManager {
     public static final GameManager INSTANCE = new GameManager();
     private GameManager() {}
 
+    @Nullable
+    private ClimbingSpot selectedClimbingSpot = null;
     private ZoomXY centerTile;
     private ZoomXY beginTile;
 
@@ -22,5 +26,18 @@ public class GameManager {
 
     public ZoomXY getBeginTile() {
         return beginTile;
+    }
+
+    public void selectClimbingSpot(ClimbingSpot spot) {
+        selectedClimbingSpot = spot;
+    }
+
+    @Nullable
+    public ClimbingSpot getSelectedClimbingSpot() {
+        return selectedClimbingSpot;
+    }
+
+    public void deselectClimbingSpot() {
+        selectedClimbingSpot = null;
     }
 }

@@ -1,7 +1,7 @@
 package si.um.feri.rocksolid.managers;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -24,9 +24,16 @@ public class ClimbingSpotManager {
         shapeRenderer.setProjectionMatrix(combinedMatrix);
         shapeRenderer.setColor(Color.RED);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        ClimbingSpot selectedSpot = GameManager.INSTANCE.getSelectedClimbingSpot();
         for (ClimbingSpot spot : climbingSpots) {
             Vector2 marker = MapRasterTiles.getPixelPosition(spot.location.lat, spot.location.lng, GameManager.INSTANCE.getBeginTile());
-            shapeRenderer.circle(marker.x, marker.y, 10);
+            if (spot != selectedSpot) {
+                shapeRenderer.circle(marker.x, marker.y, 10);
+            } else {
+                shapeRenderer.setColor(Color.YELLOW);
+                shapeRenderer.circle(marker.x, marker.y, 12);
+                shapeRenderer.setColor(Color.RED);
+            }
         }
         shapeRenderer.end();
     }
@@ -42,19 +49,25 @@ public class ClimbingSpotManager {
     }
 
     public void handleInput(PerspectiveCamera camera) {
-        if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
-            float screenX = Gdx.input.getX();
-            float screenY = Gdx.input.getY();
-            onRightClick(screenX, screenY, camera);
+        if (Gdx.input.isButtonJustPressed(Buttons.RIGHT)) {
+            Geolocation clickedLocation = MapRasterTiles.getMouseCursorGeoLocation(camera);
+            onRightClick(clickedLocation);
+        } else if (Gdx.input.isButtonJustPressed(Buttons.LEFT)) {
+            Geolocation clickedLocation = MapRasterTiles.getMouseCursorGeoLocation(camera);
+            onLeftClick(clickedLocation);
         }
     }
 
-    private void onRightClick(float screenX, float screenY, PerspectiveCamera camera) {
-        Vector2 pixelCoordinates = MapRasterTiles.getPixelPositionFromScreenCoordinates(screenX, screenY, camera);
-        if (pixelCoordinates == null) return;
-        Geolocation clickedLocation = MapRasterTiles.getGeolocationFromPixel(
-            pixelCoordinates.x, pixelCoordinates.y, GameManager.INSTANCE.getBeginTile()
-        );
+    private void onLeftClick(Geolocation clickedLocation) {
+        ClimbingSpot spot = getClimbingSportWithInDistance(clickedLocation, Constants.ClimbingSpot.PROXIMITY_DISTANCE_M);
+        if (spot == null) {
+            GameManager.INSTANCE.deselectClimbingSpot();
+        } else {
+            GameManager.INSTANCE.selectClimbingSpot(spot);
+        }
+    }
+
+    private void onRightClick(Geolocation clickedLocation) {
         addClimbingSpot(new ClimbingSpot(clickedLocation, "TEST"));
     }
 
