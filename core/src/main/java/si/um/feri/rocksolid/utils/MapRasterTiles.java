@@ -29,6 +29,10 @@ public class MapRasterTiles {
     //@2x in format means it returns higher DPI version of the image and the image size is 512px (otherwise it is 256px)
     final static public int TILE_SIZE = 512;
 
+    private static String getTileFilePath(int zoom, int x, int y) {
+        return Constants.Map.TILE_CACHE_DIR + "/tile_" + zoom + "_" + x + "_" + y + ".jpg";
+    }
+
     /**
      * Get raster tile based on zoom and tile number.
      *
@@ -39,9 +43,23 @@ public class MapRasterTiles {
      * @throws IOException
      */
     public static Texture getRasterTile(int zoom, int x, int y) throws IOException {
-        URL url = new URL(mapServiceUrl + tilesetId + "/" + zoom + "/" + x + "/" + y + format + token);
-        ByteArrayOutputStream bis = fetchTile(url);
-        return getTexture(bis.toByteArray());
+        String filePath = getTileFilePath(zoom, x, y);
+        File file = new File(filePath);
+
+        if (file.exists()) {
+            byte[] bytes = java.nio.file.Files.readAllBytes(file.toPath());
+            System.out.println("Loaded local tile: " + zoom + "/" + x + "/" + y);
+            return getTexture(bytes);
+        } else {
+            URL url = new URL(mapServiceUrl + tilesetId + "/" + zoom + "/" + x + "/" + y + format + token);
+            ByteArrayOutputStream bis = fetchTile(url);
+            new File(Constants.Map.TILE_CACHE_DIR).mkdirs();
+            try (FileOutputStream fileOutputStream = new FileOutputStream(filePath)) {
+                fileOutputStream.write(bis.toByteArray());
+            }
+            System.out.println("Loaded new tile: " + zoom + "/" + x + "/" + y);
+            return getTexture(bis.toByteArray());
+        }
     }
 
     /**
@@ -94,7 +112,6 @@ public class MapRasterTiles {
 
         for (int i = 0; i < size * size; i++) {
             array[i] = getRasterTile(zoomXY.zoom, zoomXY.x + factorX[i], zoomXY.y + factorY[i]);
-            System.out.println(zoomXY.zoom + "/" + (zoomXY.x + factorX[i]) + "/" + (zoomXY.y + factorY[i]));
         }
         return array;
     }

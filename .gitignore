@@ -13,6 +13,7 @@ gradle-app.setting
 /headless/build/
 /server/build/
 /shared/build/
+tile_cache
 
 ## Java:
 *.class
