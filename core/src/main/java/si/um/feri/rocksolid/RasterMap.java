@@ -13,8 +13,13 @@ import si.um.feri.rocksolid.managers.ClimbingSpotManager;
 import si.um.feri.rocksolid.managers.GameManager;
 import si.um.feri.rocksolid.managers.MapManager;
 import si.um.feri.rocksolid.utils.Geolocation;
+import si.um.feri.rocksolid.constants.Constants;
+
 
 import java.io.IOException;
+
+import static si.um.feri.rocksolid.utils.Keys.BACKEND_PASSWORD;
+import static si.um.feri.rocksolid.utils.Keys.BACKEND_USERNAME;
 
 public class RasterMap extends ApplicationAdapter implements GestureDetector.GestureListener {
     private ShapeRenderer shapeRenderer;
@@ -35,9 +40,9 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
         cameraManager = new CameraManager();
         climbingSpotManager = new ClimbingSpotManager();
 
-        // TODO when we have loading from api, remove these testing climbing spots
-        climbingSpotManager.addClimbingSpot(new ClimbingSpot(new Geolocation(46.554771048530625, 15.635462756256741), "Klajmber"));
-        climbingSpotManager.addClimbingSpot(new ClimbingSpot(new Geolocation(46.55625500084336, 15.635594798322796), "Klajmber"));
+        final String baseUrl = "http://localhost:3001";
+        climbingSpotManager.loadFromApi(baseUrl, BACKEND_USERNAME, BACKEND_PASSWORD,
+                Constants.CENTER_GEOLOCATION.lat, Constants.CENTER_GEOLOCATION.lng, 5.0);
     }
 
     @Override

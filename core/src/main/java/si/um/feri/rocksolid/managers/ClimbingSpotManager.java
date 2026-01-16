@@ -13,12 +13,37 @@ import si.um.feri.rocksolid.constants.Constants;
 import si.um.feri.rocksolid.data.ClimbingSpot;
 import si.um.feri.rocksolid.utils.Geolocation;
 import si.um.feri.rocksolid.utils.MapRasterTiles;
+import si.um.feri.rocksolid.network.ApiClient;
+
+import java.io.IOException;
+import java.util.List;
 
 public class ClimbingSpotManager {
     private float peopleRefreshTimer = 0f;
     private final Array<ClimbingSpot> climbingSpots = new Array<>();
 
     public ClimbingSpotManager() {}
+
+    public void loadFromApi(final String baseUrl, final String username, final String password,
+                            final double latitude, final double longitude, final double distanceKm) {
+        new Thread(() -> {
+            ApiClient client = new ApiClient();
+            try {
+                String token = client.login(baseUrl, username, password);
+                List<ClimbingSpot> list = client.fetchNearbyClimbingSpots(baseUrl, token, latitude, longitude, 20);
+                final Array<ClimbingSpot> spots = new Array<>();
+                spots.addAll(list.toArray(new ClimbingSpot[0]));
+
+                if (Gdx.app != null) {
+                    Gdx.app.postRunnable(() -> addClimbingSpots(spots));
+                } else {
+                    addClimbingSpots(spots);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }, "ClimbingSpot-API-Loader").start();
+    }
 
     public void render(ShapeRenderer shapeRenderer, Matrix4 combinedMatrix) {
         shapeRenderer.setProjectionMatrix(combinedMatrix);
