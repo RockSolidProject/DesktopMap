@@ -80,6 +80,17 @@ public class ClimbingSpotManager {
         } else if (Gdx.input.isButtonJustPressed(Buttons.LEFT)) {
             Geolocation clickedLocation = MapRasterTiles.getMouseCursorGeoLocation(camera);
             onLeftClick(clickedLocation);
+        } else if (Gdx.input.isButtonJustPressed(Buttons.MIDDLE)){
+            Geolocation clickedLocation = MapRasterTiles.getMouseCursorGeoLocation(camera);
+            onMiddleClick(clickedLocation);
+        }
+    }
+
+    private void onMiddleClick(Geolocation clickedLocation) {
+        ClimbingSpot spot = getClimbingSportWithInDistance(clickedLocation, Constants.ClimbingSpot.PROXIMITY_DISTANCE_M);
+        if (spot != null) {
+            int random = java.util.concurrent.ThreadLocalRandom.current().nextInt();
+            spot.addOrRefreshPerson(String.valueOf(random));
         }
     }
 
@@ -142,5 +153,9 @@ public class ClimbingSpotManager {
             return closestClimbingSpot;
         }
         return null;
+    }
+
+    public Array<ClimbingSpot> getClimbingSpots() {
+        return climbingSpots;
     }
 }

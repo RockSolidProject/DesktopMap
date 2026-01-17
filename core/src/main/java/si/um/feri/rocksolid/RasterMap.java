@@ -10,10 +10,12 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import si.um.feri.rocksolid.data.ClimbingSpot;
 import si.um.feri.rocksolid.managers.CameraManager;
 import si.um.feri.rocksolid.managers.ClimbingSpotManager;
+import si.um.feri.rocksolid.managers.BillboardMarkerManager;
 import si.um.feri.rocksolid.managers.GameManager;
 import si.um.feri.rocksolid.managers.MapManager;
 import si.um.feri.rocksolid.utils.Geolocation;
 import si.um.feri.rocksolid.constants.Constants;
+import si.um.feri.rocksolid.network.MqttHandler;
 
 
 import java.io.IOException;
@@ -26,6 +28,8 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
     private CameraManager cameraManager;
     private MapManager mapManager;
     private ClimbingSpotManager climbingSpotManager;
+    private BillboardMarkerManager billboardMarkerManager;
+    private MqttHandler mqttHandler;
 
     @Override
     public void create() {
@@ -39,6 +43,13 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
         }
         cameraManager = new CameraManager();
         climbingSpotManager = new ClimbingSpotManager();
+
+        billboardMarkerManager = new BillboardMarkerManager(
+            cameraManager. getCamera(),
+            climbingSpotManager
+        );
+
+        mqttHandler = new MqttHandler(climbingSpotManager);
 
         final String baseUrl = "http://localhost:3001";
         climbingSpotManager.loadFromApi(baseUrl, BACKEND_USERNAME, BACKEND_PASSWORD,
@@ -54,15 +65,23 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
         cameraManager.update();
         climbingSpotManager.update(deltaTime);
 
+        billboardMarkerManager. update(cameraManager.getCamera());
+
         ScreenUtils.clear(0, 0, 0, 1);
         mapManager.render(cameraManager.getCombinedMatrix());
         climbingSpotManager.render(shapeRenderer, cameraManager.getCombinedMatrix());
+
+        billboardMarkerManager.render();
     }
 
     @Override
     public void dispose() {
         shapeRenderer.dispose();
         mapManager.dispose();
+    }
+
+    public MqttHandler getMqttHandler() {
+        return mqttHandler;
     }
 
     @Override
