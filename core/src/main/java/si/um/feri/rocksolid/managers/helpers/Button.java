@@ -54,6 +54,10 @@ public class Button {
         bounds.set(x, y, width, height);
     }
 
+    public void setOnClick(Runnable onClick) {
+        this.onClick = onClick;
+    }
+
     public void renderBackground(ShapeRenderer shape, Matrix4 projection) {
         if(!isHovered) shape.setColor(backgroundColor);
         else shape.setColor(hoverColor);

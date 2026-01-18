@@ -18,7 +18,6 @@ public class GameManager {
     private ZoomXY beginTile;
 
 
-
     public void init() {
         centerTile = MapRasterTiles.getTileNumber(Constants.CENTER_GEOLOCATION.lat, Constants.CENTER_GEOLOCATION.lng, Constants.Map.ZOOM);
         beginTile = new ZoomXY(Constants.Map.ZOOM, centerTile.x - ((Constants.Map.NUM_TILES - 1) / 2), centerTile.y - ((Constants.Map.NUM_TILES - 1) / 2));

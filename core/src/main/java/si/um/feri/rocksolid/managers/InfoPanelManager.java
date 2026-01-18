@@ -32,6 +32,10 @@ public class InfoPanelManager {
 
     Matrix4 screenProjection = new Matrix4();
     Array<Button> buttons = new Array<>();
+    Array<Button> notificationButtons = new Array<>();
+    boolean buttonsSetup = false;
+
+    private int currentNotificationOffset = 0;
 
     private InfoPanelManager() {
         panelBounds = new Rectangle();
@@ -45,9 +49,36 @@ public class InfoPanelManager {
             new Color(0.7f, 0.2f, 0.2f, 1f),
             GameManager.INSTANCE::deselectClimbingSpot
         ));
-
     }
     public static final InfoPanelManager INSTANCE = new InfoPanelManager();
+
+    private void updateNotificationButtons() {
+        notificationButtons.clear();
+        ClimbingSpot selectedSpot = GameManager.INSTANCE.getSelectedClimbingSpot();
+        if (selectedSpot == null) return;
+
+        int notificationsToShow = 5;
+        for(int i=0; i<notificationsToShow; i++) {
+            int notificationIndex = currentNotificationOffset + i;
+            if(notificationIndex >= selectedSpot.notifications.size) break;
+            String notificationText = selectedSpot.notifications.get(notificationIndex);
+            if(notificationText == null) break;
+            Button notificationButton = new Button(
+                notificationText,
+                0.05f, 0.6f - i * 0.1f, 0.9f, 0.08f,
+                0.005f,
+                new Color(0.1f, 0.1f, 0.5f, 1f),
+                new Color(Color.WHITE),
+                new Color(0.2f, 0.2f, 0.7f, 1f),
+                ()->{}
+            );
+            notificationButton.setOnClick(()->{
+                selectedSpot.notifications.removeIndex(notificationIndex);
+                updateNotificationButtons();
+            });
+            notificationButtons.add(notificationButton);
+        }
+    }
 
     private void resizeBounds() {
         float height = Gdx.graphics.getHeight();
@@ -64,6 +95,9 @@ public class InfoPanelManager {
 
         for(Button button: buttons) {
             button.updateBounds(panelBounds.x, panelBounds.y, panelBounds.width, panelBounds.height);
+        }
+        for(Button notification: notificationButtons) {
+            notification.updateBounds(panelBounds.x, panelBounds.y, panelBounds.width, panelBounds.height);
         }
     }
 
@@ -87,12 +121,21 @@ public class InfoPanelManager {
         for(Button button: buttons) {
             button.handleInput(mouseX, mouseY, buttonClicked);
         }
+        for(Button notification: notificationButtons) {
+            notification.handleInput(mouseX, mouseY, buttonClicked);
+        }
     }
 
     public void render(SpriteBatch batch, ShapeRenderer shape, BitmapFont font) {
         ClimbingSpot selectedSpot = GameManager.INSTANCE.getSelectedClimbingSpot();
-        if (selectedSpot == null) return;
-
+        if (selectedSpot == null) {
+            buttonsSetup = false;
+            return;
+        }
+        if(!buttonsSetup) {
+            updateNotificationButtons();
+            buttonsSetup = true;
+        }
         resizeBounds();
 
         String text = "Climbing Spot Info\n\n" +
@@ -115,6 +158,9 @@ public class InfoPanelManager {
         for(Button button: buttons) {
             button.renderBackground(shape, screenProjection);
         }
+        for(Button notification: notificationButtons) {
+            notification.renderBackground(shape, screenProjection);
+        }
         shape.end();
 
         // Draw text
@@ -131,6 +177,9 @@ public class InfoPanelManager {
         }
         for(Button button: buttons) {
             button.renderText(batch, font, screenProjection, fontScale);
+        }
+        for(Button notification: notificationButtons) {
+            notification.renderText(batch, font, screenProjection, fontScale);
         }
         batch.end();
         font.getData().setScale(1f);
