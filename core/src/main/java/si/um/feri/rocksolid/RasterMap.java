@@ -2,6 +2,7 @@ package si.um.feri.rocksolid;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -41,6 +42,7 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
         shapeRenderer = new ShapeRenderer();
         bitmapFont = new BitmapFont();
         spriteBatch = new SpriteBatch();
+        mqttHandler = new MqttHandler(climbingSpotManager);
 
         try {
             GameManager.INSTANCE.init();
@@ -52,12 +54,12 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
         climbingSpotManager = new ClimbingSpotManager();
 
         billboardMarkerManager = new BillboardMarkerManager(
-            cameraManager. getCamera(),
+            cameraManager.getCamera(),
             climbingSpotManager
         );
 
         mqttHandler = new MqttHandler(climbingSpotManager);
-
+        mqttHandler.startListening();
         infoPanelManager = InfoPanelManager.INSTANCE;
 
         final String baseUrl = "http://localhost:3001";
@@ -75,9 +77,9 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
         cameraManager.update();
         climbingSpotManager.update(deltaTime);
 
-        billboardMarkerManager. update(cameraManager.getCamera());
+        billboardMarkerManager.update(cameraManager.getCamera());
 
-        ScreenUtils.clear(0, 0, 0, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         mapManager.render(cameraManager.getCombinedMatrix());
         climbingSpotManager.render(shapeRenderer, cameraManager.getCombinedMatrix());
 
@@ -89,6 +91,9 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
     public void dispose() {
         shapeRenderer.dispose();
         mapManager.dispose();
+        if (mqttHandler != null) {
+            mqttHandler.stopListening();
+        }
     }
 
     @Override

@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import org.jetbrains.annotations.Nullable;
@@ -15,6 +14,7 @@ import si.um.feri.rocksolid.data.ClimbingSpot;
 import si.um.feri.rocksolid.utils.Geolocation;
 import si.um.feri.rocksolid.utils.MapRasterTiles;
 import si.um.feri.rocksolid.network.ApiClient;
+import si.um.feri.rocksolid.data.Message;
 
 import java.io.IOException;
 import java.util.List;
@@ -94,7 +94,6 @@ public class ClimbingSpotManager {
     }
 
     private void onMiddleClick(Geolocation clickedLocation) {
-        System.out.println("sth");
         ClimbingSpot spot = getClimbingSportWithInDistance(clickedLocation, Constants.ClimbingSpot.PROXIMITY_DISTANCE_M);
         if (spot != null) {
             int random = java.util.concurrent.ThreadLocalRandom.current().nextInt();
@@ -130,11 +129,14 @@ public class ClimbingSpotManager {
         }
     }
 
-    public void addMessage(Geolocation location, String message) {
+    public void addMessage(double latitude, double longitude, String content, String type, String timestamp, String sender) {
+        Geolocation location = new Geolocation(latitude, longitude);
         ClimbingSpot spot = getClimbingSportWithInDistance(location, Constants.ClimbingSpot.PROXIMITY_DISTANCE_M);
         if (spot != null) {
-            // TODO
-            // THIS WILL HANDLE NOTIFICATIONS INCLUDING PEOPLE FALLING OR NORMAL MESSAGES
+            Message message = new Message(content, type, timestamp, latitude, longitude, sender);
+            spot.addMessage(message);
+        } else {
+            System.out.println("Prejeto, ampak ni plezališča v bližini:  " + content);
         }
     }
 
