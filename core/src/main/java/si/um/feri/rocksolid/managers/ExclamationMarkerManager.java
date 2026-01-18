@@ -32,14 +32,14 @@ public class ExclamationMarkerManager {
 
     private final Map<ClimbingSpot, ExclamationMarker> markers = new HashMap<>();
 
-    private static final float BASE_HEIGHT = 50f;
-    private static final float CONE_HEIGHT = 50f;
-    private static final float CONE_RADIUS = 15f;
-    private static final float SPHERE_RADIUS = 10f;
+    private static final float BASE_HEIGHT = 70f;
+    private static final float CONE_HEIGHT = 25f;
+    private static final float CONE_RADIUS = 5f;
+    private static final float SPHERE_RADIUS = 5f;
     private static final float ANIMATION_SPEED = 2f;
-    private static final float BOUNCE_AMPLITUDE = 5f;
+    private static final float BOUNCE_AMPLITUDE = 10f;
     private static final float MIN_SPACING = 2f;
-    private static final float MAX_SPACING = 8f;
+    private static final float MAX_SPACING = 6f;
 
     private float animationTime = 0f;
 
@@ -86,7 +86,7 @@ public class ExclamationMarkerManager {
 
         // Add markers for spots with notifications
         for (ClimbingSpot spot : spots) {
-            if (spot.notifications != null && spot.notifications.size > 0) {
+            if (spot.messages != null && spot.messages.size > 0) {
                 if (!markers.containsKey(spot)) {
                     markers.put(spot, new ExclamationMarker(spot));
                 }
@@ -176,10 +176,11 @@ public class ExclamationMarkerManager {
             // Rotate cone 180 degrees on X axis to point downward (inverted)
             float coneZ = sphereZ + SPHERE_RADIUS + spacing + CONE_HEIGHT / 2f;
             coneInstance.transform.setToTranslation(pixelPos.x, pixelPos.y, coneZ);
-            coneInstance.transform.rotate(Vector3.X, 180f);
+            coneInstance.transform.rotate(Vector3.X, -90f);
+
 
             // Color based on notification count
-            Color markerColor = getColorForNotificationCount(spot.notifications.size);
+            Color markerColor = getColorForNotificationCount(spot.messages.size);
             setInstanceColor(coneInstance, markerColor);
             setInstanceColor(sphereInstance, markerColor);
         }
@@ -192,13 +193,13 @@ public class ExclamationMarkerManager {
             }
         }
 
-        private Color getColorForNotificationCount(int count) {
+        private Color getColorForNotificationCount(int count) { // TODO: add gradients
             if (count <= 2) {
-                return new Color(1f, 0.9f, 0.1f, 1f); // Yellow
+                return new Color(Color.YELLOW); // Yellow
             } else if (count <= 5) {
-                return new Color(1f, 0.5f, 0.1f, 1f); // Orange
+                return new Color(Color.ORANGE); // Orange
             } else {
-                return new Color(0.9f, 0.1f, 0.1f, 1f); // Red
+                return new Color(Color.RED); // Red
             }
         }
     }

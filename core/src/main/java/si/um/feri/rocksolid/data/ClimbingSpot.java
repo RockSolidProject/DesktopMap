@@ -15,15 +15,14 @@ public class ClimbingSpot {
     // For counting people
     private Set<String> currentPeopleSet = new HashSet<>();
     private Set<String> previousPeopleSet = new HashSet<>();
-    public Array<String> notifications = new Array<>(); // TODO change to actual notifications
-    private Array<Message> messages = new Array<>();
+    public Array<Message> messages = new Array<>();
 
     public ClimbingSpot(Geolocation location, String name) {
         this.location = location;
         this.name = name;
-        int randomNum = (int)(Math.random() * 100);
+        int randomNum = (int)(Math.random() * 10);
         for(int i=0; i<randomNum; i++) {
-            notifications.add("Notification " + (i+1) + " is at " + name);
+            messages.add(new Message("Test message " + (i+1), "info", "2024-01-01T12:00:00Z", location.lat, location.lng, "User" + (i+1)));
         } // TODO remove when done testing
     }
 

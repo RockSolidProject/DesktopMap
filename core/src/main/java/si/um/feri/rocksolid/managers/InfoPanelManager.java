@@ -85,7 +85,7 @@ public class InfoPanelManager {
             ()->{
                 ClimbingSpot selectedSpot = GameManager.INSTANCE.getSelectedClimbingSpot();
                 if(selectedSpot == null) return;
-                int maxOffset = Math.max(0, selectedSpot.notifications.size - notificationsAtOnce);
+                int maxOffset = Math.max(0, selectedSpot.getMessages().size - notificationsAtOnce);
                 if(currentNotificationOffset < maxOffset) {
                     currentNotificationOffset += notificationsAtOnce;
                     updateNotificationButtons();
@@ -102,9 +102,8 @@ public class InfoPanelManager {
         int notificationsToShow = 5;
         for(int i=0; i<notificationsToShow; i++) {
             int notificationIndex = currentNotificationOffset + i;
-            if(notificationIndex >= selectedSpot.notifications.size) break;
-            String notificationText = selectedSpot.notifications.get(notificationIndex);
-            if(notificationText == null) break;
+            if(notificationIndex >= selectedSpot.getMessages().size) break;
+            String notificationText = selectedSpot.messages.get(notificationIndex).type.toUpperCase() + ": " + selectedSpot.messages.get(notificationIndex).content;
 
             Button notificationButton = new Button(
                 notificationText,
@@ -116,7 +115,7 @@ public class InfoPanelManager {
                 ()->{}
             );
             notificationButton.setOnClick(()->{
-                selectedSpot.notifications.removeIndex(notificationIndex);
+                selectedSpot.messages.removeIndex(notificationIndex);
                 updateNotificationButtons();
             });
             notificationButtons.add(notificationButton);
