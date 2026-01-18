@@ -30,16 +30,25 @@ public class InfoPanelManager {
 
     private float lineHeight = 20f;
 
+    private final int notificationsAtOnce = 5;
+
     Matrix4 screenProjection = new Matrix4();
     Array<Button> buttons = new Array<>();
     Array<Button> notificationButtons = new Array<>();
     boolean buttonsSetup = false;
 
     private int currentNotificationOffset = 0;
+    ClimbingSpot previouslySelectedSpot = null;
 
     private InfoPanelManager() {
         panelBounds = new Rectangle();
         resizeBounds();
+        initializeButtons();
+
+    }
+    public static final InfoPanelManager INSTANCE = new InfoPanelManager();
+
+    private void initializeButtons() {
         buttons.add(new Button(
             "Close",
             0.7f, 0.9f, 0.25f, 0.08f,
@@ -49,8 +58,41 @@ public class InfoPanelManager {
             new Color(0.7f, 0.2f, 0.2f, 1f),
             GameManager.INSTANCE::deselectClimbingSpot
         ));
+
+        buttons.add(new Button(
+            "Previous",
+            0.15f, 0.05f, 0.25f, 0.08f,
+            0.01f,
+            new Color(0.1f, 0.1f, 0.5f, 1f),
+            new Color(Color.WHITE),
+            new Color(0.2f, 0.2f, 0.7f, 1f),
+            ()->{
+                if(currentNotificationOffset > notificationsAtOnce -1) {
+                    currentNotificationOffset-= notificationsAtOnce;
+                    updateNotificationButtons();
+                }
+            }
+
+        ));
+        buttons.add(new Button(
+            "Next",
+            0.6f, 0.05f, 0.25f, 0.08f,
+            0.01f,
+            new Color(0.1f, 0.5f, 0.1f, 1f),
+            new Color(Color.WHITE),
+            new Color(0.2f, 0.7f, 0.2f, 1f),
+
+            ()->{
+                ClimbingSpot selectedSpot = GameManager.INSTANCE.getSelectedClimbingSpot();
+                if(selectedSpot == null) return;
+                int maxOffset = Math.max(0, selectedSpot.notifications.size - notificationsAtOnce);
+                if(currentNotificationOffset < maxOffset) {
+                    currentNotificationOffset += notificationsAtOnce;
+                    updateNotificationButtons();
+                }
+            }
+        ));
     }
-    public static final InfoPanelManager INSTANCE = new InfoPanelManager();
 
     private void updateNotificationButtons() {
         notificationButtons.clear();
@@ -63,13 +105,14 @@ public class InfoPanelManager {
             if(notificationIndex >= selectedSpot.notifications.size) break;
             String notificationText = selectedSpot.notifications.get(notificationIndex);
             if(notificationText == null) break;
+
             Button notificationButton = new Button(
                 notificationText,
                 0.05f, 0.6f - i * 0.1f, 0.9f, 0.08f,
                 0.005f,
-                new Color(0.1f, 0.1f, 0.5f, 1f),
+                new Color(Color.DARK_GRAY),
                 new Color(Color.WHITE),
-                new Color(0.2f, 0.2f, 0.7f, 1f),
+                new Color(Color.GRAY),
                 ()->{}
             );
             notificationButton.setOnClick(()->{
@@ -132,9 +175,11 @@ public class InfoPanelManager {
             buttonsSetup = false;
             return;
         }
-        if(!buttonsSetup) {
+        if(!buttonsSetup || previouslySelectedSpot != selectedSpot) {
             updateNotificationButtons();
             buttonsSetup = true;
+            previouslySelectedSpot = selectedSpot;
+            currentNotificationOffset = 0;
         }
         resizeBounds();
 
@@ -153,7 +198,7 @@ public class InfoPanelManager {
         // Draw panel background
         shape.setProjectionMatrix(screenProjection);
         shape.begin(ShapeRenderer.ShapeType.Filled);
-        shape.setColor(new Color(0.2f, 0.2f, 0.2f, 0.8f));
+        shape.setColor(new Color(Color.BLACK.r, Color.BLACK.g, Color.BLACK.b, 0.7f));
         shape.rect(panelBounds.x, panelBounds.y, panelBounds.width, panelBounds.height);
         for(Button button: buttons) {
             button.renderBackground(shape, screenProjection);
