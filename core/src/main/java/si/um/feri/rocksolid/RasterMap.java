@@ -69,6 +69,7 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
     public void render() {
         float deltaTime = Gdx.graphics.getDeltaTime();
         cameraManager.handleInput(deltaTime);
+        infoPanelManager.handleInput();
         climbingSpotManager.handleInput(cameraManager.getCamera());
 
         cameraManager.update();
