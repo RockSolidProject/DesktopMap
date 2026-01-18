@@ -1,10 +1,12 @@
 package si.um.feri.rocksolid.data;
+
+import com.badlogic.gdx.utils.Array;
+
 import com.badlogic.gdx.utils.Array;
 import si.um.feri.rocksolid.utils.Geolocation;
 
 import java.util.HashSet;
 import java.util.Set;
-
 
 public class ClimbingSpot {
     public final Geolocation location;
@@ -13,12 +15,16 @@ public class ClimbingSpot {
     // For counting people
     private Set<String> currentPeopleSet = new HashSet<>();
     private Set<String> previousPeopleSet = new HashSet<>();
-
+    public Array<String> notifications = new Array<>(); // TODO change to actual notifications
     private Array<Message> messages = new Array<>();
 
     public ClimbingSpot(Geolocation location, String name) {
         this.location = location;
         this.name = name;
+        int randomNum = (int)(Math.random() * 100);
+        for(int i=0; i<randomNum; i++) {
+            notifications.add("Notification " + (i+1) + " is at " + name);
+        } // TODO remove when done testing
     }
 
     public String toString() {

@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import si.um.feri.rocksolid.managers.CameraManager;
 import si.um.feri.rocksolid.managers.ClimbingSpotManager;
 import si.um.feri.rocksolid.managers.BillboardMarkerManager;
+import si.um.feri.rocksolid.managers.ExclamationMarkerManager;
 import si.um.feri.rocksolid.managers.GameManager;
 import si.um.feri.rocksolid.managers.InfoPanelManager;
 import si.um.feri.rocksolid.managers.MapManager;
@@ -36,6 +37,7 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
     private BillboardMarkerManager billboardMarkerManager;
     private InfoPanelManager infoPanelManager;
     private MqttHandler mqttHandler;
+    private ExclamationMarkerManager exclamationMarkerManager;
 
     @Override
     public void create() {
@@ -61,6 +63,10 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
         mqttHandler = new MqttHandler(climbingSpotManager);
         mqttHandler.startListening();
         infoPanelManager = InfoPanelManager.INSTANCE;
+        exclamationMarkerManager = new ExclamationMarkerManager(
+            cameraManager.getCamera(),
+            climbingSpotManager
+        );
 
         final String baseUrl = "http://localhost:3001";
         climbingSpotManager.loadFromApi(baseUrl, BACKEND_USERNAME, BACKEND_PASSWORD,
@@ -73,6 +79,7 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
         cameraManager.handleInput(deltaTime);
         infoPanelManager.handleInput();
         climbingSpotManager.handleInput(cameraManager.getCamera());
+        exclamationMarkerManager.update(deltaTime);
 
         cameraManager.update();
         climbingSpotManager.update(deltaTime);
@@ -85,12 +92,14 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
 
         billboardMarkerManager.render();
         infoPanelManager.render(spriteBatch, shapeRenderer, bitmapFont);
+        exclamationMarkerManager.render();
     }
 
     @Override
     public void dispose() {
         shapeRenderer.dispose();
         mapManager.dispose();
+        exclamationMarkerManager.dispose();
         if (mqttHandler != null) {
             mqttHandler.stopListening();
         }
