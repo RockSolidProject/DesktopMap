@@ -1,21 +1,21 @@
-package si.um. feri.rocksolid.managers;
+package si.um.feri.rocksolid.managers;
 
-import com.badlogic. gdx. Gdx;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
-import com. badlogic.gdx.graphics.Color;
-import com. badlogic.gdx.graphics.GL20;
-import com.badlogic. gdx.graphics. Texture;
-import com.badlogic.gdx.graphics.g2d. TextureRegion;
-import com.badlogic. gdx.graphics. g3d.decals.CameraGroupStrategy;
-import com. badlogic.gdx.graphics.g3d.decals.Decal;
-import com.badlogic.gdx.graphics.g3d.decals. DecalBatch;
-import com.badlogic. gdx.math.Vector2;
-import com.badlogic.gdx. utils.Array;
-import si.um.feri.rocksolid. data.ClimbingSpot;
-import si.um.feri.rocksolid. utils.MapRasterTiles;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g3d.decals.CameraGroupStrategy;
+import com.badlogic.gdx.graphics.g3d.decals.Decal;
+import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
+import si.um.feri.rocksolid.data.ClimbingSpot;
+import si.um.feri.rocksolid.utils.MapRasterTiles;
 
 import java.util.HashMap;
-import java. util.Map;
+import java.util.Map;
 
 public class BillboardMarkerManager {
     private DecalBatch decalBatch;
@@ -35,19 +35,19 @@ public class BillboardMarkerManager {
     private static final int GROUP_THRESHOLD = 10;
 
     public BillboardMarkerManager(Camera camera, ClimbingSpotManager climbingSpotManager) {
-        this. camera = camera;
+        this.camera = camera;
         this.climbingSpotManager = climbingSpotManager;
         this.decalBatch = new DecalBatch(new CameraGroupStrategy(camera));
 
-        this.singlePersonTexture = new Texture(Gdx. files.internal("user.png"));
-        this.groupTexture = new Texture(Gdx. files.internal("group.png"));
+        this.singlePersonTexture = new Texture(Gdx.files.internal("user.png"));
+        this.groupTexture = new Texture(Gdx.files.internal("group.png"));
     }
 
     public void update(Camera camera) {
         Array<ClimbingSpot> spots = climbingSpotManager.getClimbingSpots();
 
         for (ClimbingSpot spot : spots) {
-            int peopleCount = spot. getNumberOfPeople();
+            int peopleCount = spot.getNumberOfPeople();
 
             if (peopleCount > 0) {
                 Decal decal = spotDecals.get(spot);
@@ -83,7 +83,7 @@ public class BillboardMarkerManager {
     private void updateDecal(Decal decal, ClimbingSpot spot, int peopleCount) {
         Texture targetTexture = (peopleCount > GROUP_THRESHOLD) ? groupTexture : singlePersonTexture;
         if (decal.getTextureRegion().getTexture() != targetTexture) {
-            decal. setTextureRegion(new TextureRegion(targetTexture));
+            decal.setTextureRegion(new TextureRegion(targetTexture));
         }
 
         decal.setColor(getColorForPeopleCount(peopleCount));
@@ -91,14 +91,14 @@ public class BillboardMarkerManager {
         float size = calculateSize(peopleCount);
         decal.setDimensions(size, size);
 
-        Vector2 pixelPos = MapRasterTiles. getPixelPosition(
-            spot.location. lat,
+        Vector2 pixelPos = MapRasterTiles.getPixelPosition(
+            spot.location.lat,
             spot.location.lng,
             GameManager.INSTANCE.getBeginTile()
         );
-        decal.setPosition(pixelPos. x, pixelPos.y, Z_HEIGHT + size / 2f);
+        decal.setPosition(pixelPos.x, pixelPos.y, Z_HEIGHT + size / 2f);
 
-        decal. lookAt(camera.position, camera.up);
+        decal.lookAt(camera.position, camera.up);
     }
 
     private Color getColorForPeopleCount(int peopleCount) {
@@ -116,7 +116,7 @@ public class BillboardMarkerManager {
     private float calculateSize(int personCount) {
         float scaleFactor = 1f + (float) Math.log10(Math.max(1, personCount))*((float) 2 /3);
         float size = BASE_SIZE * scaleFactor;
-        return Math. max(MIN_SIZE, Math.min(MAX_SIZE, size));
+        return Math.max(MIN_SIZE, Math.min(MAX_SIZE, size));
     }
 
     public void render() {
@@ -128,7 +128,7 @@ public class BillboardMarkerManager {
 
     public void dispose() {
         decalBatch.dispose();
-        singlePersonTexture. dispose();
+        singlePersonTexture.dispose();
         groupTexture.dispose();
         spotDecals.clear();
     }

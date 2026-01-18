@@ -3,6 +3,7 @@ package si.um.feri.rocksolid;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
@@ -65,9 +66,9 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
         cameraManager.update();
         climbingSpotManager.update(deltaTime);
 
-        billboardMarkerManager. update(cameraManager.getCamera());
+        billboardMarkerManager.update(cameraManager.getCamera());
 
-        ScreenUtils.clear(0, 0, 0, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         mapManager.render(cameraManager.getCombinedMatrix());
         climbingSpotManager.render(shapeRenderer, cameraManager.getCombinedMatrix());
 
