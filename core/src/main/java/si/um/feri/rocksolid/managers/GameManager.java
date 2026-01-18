@@ -1,5 +1,7 @@
 package si.um.feri.rocksolid.managers;
 
+import com.badlogic.gdx.Gdx;
+
 import org.jetbrains.annotations.Nullable;
 import si.um.feri.rocksolid.constants.Constants;
 import si.um.feri.rocksolid.data.ClimbingSpot;
@@ -14,6 +16,8 @@ public class GameManager {
     private ClimbingSpot selectedClimbingSpot = null;
     private ZoomXY centerTile;
     private ZoomXY beginTile;
+
+
 
     public void init() {
         centerTile = MapRasterTiles.getTileNumber(Constants.CENTER_GEOLOCATION.lat, Constants.CENTER_GEOLOCATION.lng, Constants.Map.ZOOM);

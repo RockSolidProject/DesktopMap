@@ -2,19 +2,20 @@ package si.um.feri.rocksolid;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Buttons;
-import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
-import si.um.feri.rocksolid.data.ClimbingSpot;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+
 import si.um.feri.rocksolid.managers.CameraManager;
 import si.um.feri.rocksolid.managers.ClimbingSpotManager;
 import si.um.feri.rocksolid.managers.BillboardMarkerManager;
 import si.um.feri.rocksolid.managers.GameManager;
+import si.um.feri.rocksolid.managers.InfoPanelManager;
 import si.um.feri.rocksolid.managers.MapManager;
-import si.um.feri.rocksolid.utils.Geolocation;
 import si.um.feri.rocksolid.constants.Constants;
 import si.um.feri.rocksolid.network.MqttHandler;
 
@@ -26,15 +27,20 @@ import static si.um.feri.rocksolid.utils.Keys.BACKEND_USERNAME;
 
 public class RasterMap extends ApplicationAdapter implements GestureDetector.GestureListener {
     private ShapeRenderer shapeRenderer;
+    private SpriteBatch spriteBatch;
+    private BitmapFont bitmapFont;
     private CameraManager cameraManager;
     private MapManager mapManager;
     private ClimbingSpotManager climbingSpotManager;
     private BillboardMarkerManager billboardMarkerManager;
+    private InfoPanelManager infoPanelManager;
     private MqttHandler mqttHandler;
 
     @Override
     public void create() {
         shapeRenderer = new ShapeRenderer();
+        bitmapFont = new BitmapFont();
+        spriteBatch = new SpriteBatch();
 
         try {
             GameManager.INSTANCE.init();
@@ -52,6 +58,8 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
 
         mqttHandler = new MqttHandler(climbingSpotManager);
 
+        infoPanelManager = InfoPanelManager.INSTANCE;
+
         final String baseUrl = "http://localhost:3001";
         climbingSpotManager.loadFromApi(baseUrl, BACKEND_USERNAME, BACKEND_PASSWORD,
                 Constants.CENTER_GEOLOCATION.lat, Constants.CENTER_GEOLOCATION.lng, 5.0);
@@ -66,19 +74,25 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
         cameraManager.update();
         climbingSpotManager.update(deltaTime);
 
-        billboardMarkerManager.update(cameraManager.getCamera());
+        billboardMarkerManager. update(cameraManager.getCamera());
 
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+        ScreenUtils.clear(0, 0, 0, 1);
         mapManager.render(cameraManager.getCombinedMatrix());
         climbingSpotManager.render(shapeRenderer, cameraManager.getCombinedMatrix());
 
         billboardMarkerManager.render();
+        infoPanelManager.render(spriteBatch, shapeRenderer, bitmapFont);
     }
 
     @Override
     public void dispose() {
         shapeRenderer.dispose();
         mapManager.dispose();
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        infoPanelManager.resize();
     }
 
     public MqttHandler getMqttHandler() {

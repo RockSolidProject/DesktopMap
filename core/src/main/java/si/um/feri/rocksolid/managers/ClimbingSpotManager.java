@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import org.jetbrains.annotations.Nullable;
@@ -74,19 +75,26 @@ public class ClimbingSpotManager {
     }
 
     public void handleInput(PerspectiveCamera camera) {
+        ClimbingSpot selectedSpot = GameManager.INSTANCE.getSelectedClimbingSpot();
+        if(isClickedOnPanel(selectedSpot, Gdx.input.getX(), Gdx.input.getY())) return;
         if (Gdx.input.isButtonJustPressed(Buttons.RIGHT)) {
             Geolocation clickedLocation = MapRasterTiles.getMouseCursorGeoLocation(camera);
             onRightClick(clickedLocation);
         } else if (Gdx.input.isButtonJustPressed(Buttons.LEFT)) {
             Geolocation clickedLocation = MapRasterTiles.getMouseCursorGeoLocation(camera);
             onLeftClick(clickedLocation);
-        } else if (Gdx.input.isButtonJustPressed(Buttons.MIDDLE)){
+        } else if (Gdx.input.isButtonJustPressed(Buttons.MIDDLE) && selectedSpot != null) {
             Geolocation clickedLocation = MapRasterTiles.getMouseCursorGeoLocation(camera);
-            onMiddleClick(clickedLocation);
+            onMiddleClick(clickedLocation); // TODO this is for testing
         }
+    }
+    private boolean isClickedOnPanel(ClimbingSpot selectedSpot, float screenX, float screenY) {
+        if(selectedSpot == null) return false;
+        return InfoPanelManager.INSTANCE.isClickedOnPanel(screenX, screenY);
     }
 
     private void onMiddleClick(Geolocation clickedLocation) {
+        System.out.println("sth");
         ClimbingSpot spot = getClimbingSportWithInDistance(clickedLocation, Constants.ClimbingSpot.PROXIMITY_DISTANCE_M);
         if (spot != null) {
             int random = java.util.concurrent.ThreadLocalRandom.current().nextInt();
