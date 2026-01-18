@@ -198,7 +198,7 @@ public class InfoPanelManager {
         // Draw panel background
         shape.setProjectionMatrix(screenProjection);
         shape.begin(ShapeRenderer.ShapeType.Filled);
-        shape.setColor(new Color(Color.BLACK.r, Color.BLACK.g, Color.BLACK.b, 0.7f));
+        shape.setColor(new Color(Color.BLACK.r, Color.BLACK.g, Color.BLACK.b, 0.8f));
         shape.rect(panelBounds.x, panelBounds.y, panelBounds.width, panelBounds.height);
         for(Button button: buttons) {
             button.renderBackground(shape, screenProjection);
@@ -217,8 +217,10 @@ public class InfoPanelManager {
         String[] lines = text.split("\n");
 
         for (int i = 0; i < lines.length; i++) {
+            if(i == 0) font.getData().setScale(1.7f*fontScale);
             font.draw(batch, lines[i], panelBounds.x + panelPadding,
                 panelBounds.y + panelBounds.height - panelPadding - i * (lineHeight + textPadding));
+            if(i == 0) font.getData().setScale(fontScale);
         }
         for(Button button: buttons) {
             button.renderText(batch, font, screenProjection, fontScale);
