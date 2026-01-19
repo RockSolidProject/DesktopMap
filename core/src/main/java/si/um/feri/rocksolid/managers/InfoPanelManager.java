@@ -15,10 +15,12 @@ import com.badlogic.gdx.utils.Array;
 import si.um.feri.rocksolid.data.ClimbingSpot;
 import si.um.feri.rocksolid.managers.helpers.Button;
 
+import java.util.Objects;
+
 public class InfoPanelManager {
     public static final float STARTING_HEIGHT = Gdx.graphics.getHeight();
-    public static final float PANEL_PADDING_RELATIVE = 0.01f;
-    public static final float TEXT_PADDING_RELATIVE = 0.01f;
+    public static final float PANEL_PADDING_RELATIVE = 0.015f;
+    public static final float TEXT_PADDING_RELATIVE = 0.02f;
     public static final float PANEL_WIDTH_RELATIVE = 0.3f;
     public static final float PANEL_HEIGHT_RELATIVE = 1f;
 
@@ -100,6 +102,8 @@ public class InfoPanelManager {
         if (selectedSpot == null) return;
 
         int notificationsToShow = 5;
+        Color dangerColor = new Color(0.5f, 0.1f, 0.1f, 1f);
+        Color dangerColorHover = new Color(0.7f, 0.2f, 0.2f, 1f);
         for(int i=0; i<notificationsToShow; i++) {
             int notificationIndex = currentNotificationOffset + i;
             if(notificationIndex >= selectedSpot.getMessages().size) break;
@@ -109,9 +113,9 @@ public class InfoPanelManager {
                 notificationText,
                 0.05f, 0.6f - i * 0.1f, 0.9f, 0.08f,
                 0.005f,
-                new Color(Color.DARK_GRAY),
+                (Objects.equals(selectedSpot.messages.get(notificationIndex).type, "extreme")) ? dangerColor : new Color(Color.DARK_GRAY),
                 new Color(Color.WHITE),
-                new Color(Color.GRAY),
+                (Objects.equals(selectedSpot.messages.get(notificationIndex).type, "extreme")) ? dangerColorHover : new Color(Color.DARK_GRAY),
                 ()->{}
             );
             notificationButton.setOnClick(()->{

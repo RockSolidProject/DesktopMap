@@ -20,10 +20,10 @@ public class ClimbingSpot {
     public ClimbingSpot(Geolocation location, String name) {
         this.location = location;
         this.name = name;
-        int randomNum = (int)(Math.random() * 10);
-        for(int i=0; i<randomNum; i++) {
-            messages.add(new Message("Test message " + (i+1), "info", "2024-01-01T12:00:00Z", location.lat, location.lng, "User" + (i+1)));
-        } // TODO remove when done testing
+      //  int randomNum = (int)(Math.random() * 10);
+      //  for(int i=0; i<randomNum; i++) {
+      //      messages.add(new Message("Test message " + (i+1), "info", "2024-01-01T12:00:00Z", location.lat, location.lng, "User" + (i+1)));
+      //  } // TODO remove when done testing
     }
 
     public String toString() {

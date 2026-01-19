@@ -5,7 +5,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
@@ -43,9 +42,9 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
     @Override
     public void create() {
         shapeRenderer = new ShapeRenderer();
-
         bitmapFont = new BitmapFont();
         spriteBatch = new SpriteBatch();
+        mqttHandler = new MqttHandler(climbingSpotManager);
 
         try {
             GameManager.INSTANCE.init();
@@ -57,12 +56,12 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
         climbingSpotManager = new ClimbingSpotManager();
 
         billboardMarkerManager = new BillboardMarkerManager(
-            cameraManager. getCamera(),
+            cameraManager.getCamera(),
             climbingSpotManager
         );
 
         mqttHandler = new MqttHandler(climbingSpotManager);
-
+        mqttHandler.startListening();
         infoPanelManager = InfoPanelManager.INSTANCE;
         exclamationMarkerManager = new ExclamationMarkerManager(
             cameraManager.getCamera(),
@@ -71,7 +70,7 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
 
         final String baseUrl = "http://localhost:3001";
         climbingSpotManager.loadFromApi(baseUrl, BACKEND_USERNAME, BACKEND_PASSWORD,
-                Constants.CENTER_GEOLOCATION.lat, Constants.CENTER_GEOLOCATION.lng, 5.0);
+            Constants.CENTER_GEOLOCATION.lat, Constants.CENTER_GEOLOCATION.lng, 5.0);
     }
 
     @Override
@@ -85,10 +84,9 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
         cameraManager.update();
         climbingSpotManager.update(deltaTime);
 
-        billboardMarkerManager. update(cameraManager.getCamera());
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+        billboardMarkerManager.update(cameraManager.getCamera());
 
-//        ScreenUtils.clear(0, 0, 0, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         mapManager.render(cameraManager.getCombinedMatrix());
         climbingSpotManager.render(shapeRenderer, cameraManager.getCombinedMatrix());
 
@@ -102,8 +100,10 @@ public class RasterMap extends ApplicationAdapter implements GestureDetector.Ges
         shapeRenderer.dispose();
         mapManager.dispose();
         exclamationMarkerManager.dispose();
+        if (mqttHandler != null) {
+            mqttHandler.stopListening();
+        }
     }
-
 
     @Override
     public void resize(int width, int height) {
